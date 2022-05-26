@@ -26,6 +26,9 @@ func (n *Numeric) Scan(value interface{}) error {
 }
 
 func (n Numeric) Value() (driver.Value, error) {
+	if n.Int == nil {
+		return nil, nil
+	}
 	return n.Int.String(), nil
 }
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/big"
+	"strings"
 )
 
 type Numeric struct {
@@ -30,6 +31,23 @@ func (n Numeric) Value() (driver.Value, error) {
 		return nil, nil
 	}
 	return n.Int.String(), nil
+}
+
+func (n Numeric) MarshalJSON() ([]byte, error) {
+	return []byte(n.Int.String()), nil
+}
+
+func (n *Numeric) UnmarshalJSON(p []byte) error {
+	numericString := strings.Trim(string(p), "\"'")
+	if numericString == "null" {
+		return nil
+	}
+	var ok bool
+	n.Int, ok = new(big.Int).SetString(numericString, 10)
+	if !ok {
+		return fmt.Errorf("not a valid big integer: %s", p)
+	}
+	return nil
 }
 
 type NumericList struct {
